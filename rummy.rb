@@ -1,22 +1,32 @@
-$suits = %w(Clubs Diamonds Hearts Spades)
-A = 'Ace'
-J = 'Jack'
-Q = 'Queen'
-K = 'King'
-$ranks = [A, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K]
+SUITS = [:clubs, :diamonds, :hearts, :spades]
+RANKS = {
+  ace: 1,
+  two: 2,
+  three: 3,
+  four: 4, 
+  five: 5, 
+  six: 6, 
+  seven: 7, 
+  eight: 8, 
+  nine: 9, 
+  ten: 10, 
+  jack: 11,
+  queen: 12,
+  king: 13
+}
 
 class Card
   attr_reader :rank, :suit, :value
 
   def initialize(rank, suit)
-    @rank, @suit = rank, suit
+    @rank, @suit = RANKS[rank], suit
   end
 
   def calc_value
-    if @rank == 'Ace'
-      @value = 1
-    elsif @rank.instance_of?(String)
+    if @rank > 10
       @value = 10
+    elsif @rank == 1
+      @value = 1
     else 
       @value = @rank
     end
@@ -33,8 +43,8 @@ class Deck
   end
 
   def full
-    $suits.each do |suit| 
-      $ranks.each do |rank| 
+    SUITS.each do |suit| 
+      RANKS.each_key do |rank| 
         @cards << Card.new(rank, suit)
       end
     end
@@ -56,16 +66,16 @@ class Deck
 end
 
 class Player
-  attr_reader :cards, :score, :sets, :runs
+  attr_reader :cards, :score, :sets, :runs, :melds, :spades, :diamonds,
+    :clubs, :hearts, :ace, :two, :three, :four, :five, :six, :seven,
+    :eight, :nine, :ten, :jack, :queen, :king
 
   def initialize(cards)
-    @cards = []
+    @cards, @melds, @runs, @sets = [], [], [], []
     @score = 0
     cards.each { |card| @cards << card }
-    @sets = {}
-    @runs = {}
-    $ranks.each { |rank| @sets[rank] = Array.new }
-    $suits.each { |suit| @runs[suit] = Array.new }
+    RANKS.each_key { |rank| instance_variable_set("@#{rank}", Array.new) }
+    SUITS.each { |suit| instance_variable_set("@#{suit}", Array.new) }
   end
 
   def draw(card)
@@ -79,23 +89,69 @@ class Player
   def calc_score
   end
 
-  def find_sets
-    $ranks.each do |rank|
+  def find_sets # also sorts by rank
+    RANKS.each do |rank, int|
+      matches = []
       @cards.each do |card|
-        @sets[rank] << card if card.rank == rank
+        matches << card if card.rank == int
       end
+      if matches.length >= 3
+        instance_variable_set("@#{rank}", matches)
+        instance_variable_set(:@sets, matches)
+      end
+    end
+  end
+
+  def sort_hand
+    @cards.sort_by! { |card| card.rank }
+  end
+
+  def sort_by_suit
+    SUITS.each do |suit|
+      matches = []
+      @cards.each do |card|
+        matches << card if card.suit == suit
+      end
+      instance_variable_set("@#{suit}", matches)
     end
   end
 
   def find_runs
-    $suits.each do |suit|
-      @cards.each do |card|
-        @runs[suit] << card if card.suit == suit
+    suits = [@clubs, @diamonds, @hearts, @spades]
+    suits.each do |suit|
+      suit.each do |card1|
+        suit.each do |card2|
+          suit.each do |card3|
+            c1 = card1.rank
+            c2 = card2.rank
+            c3 = card3.rank
+            unless @runs.include?(card1)
+              if c1 == c2 + 1 && c1 == c3 + 2
+                @runs << card1
+              elsif c1 == c2 - 1 && c1 == c3 + 1
+                @runs << card1
+              elsif c1 == c2 - 1 && c1 == c3 - 2
+                @runs << card1
+              end
+            end
+          end
+        end
       end
     end
   end
 
+  def find_melds
+    @melds = @runs.concat(@sets)
+  end
+
   def find_cards_in_2_melds
+    @sets.each do |card1|
+      @runs.each do |card2|
+        if card1 == card2
+          puts "Warning: #{card1} is in in two melds"
+        end
+      end
+    end
   end
 
   def deadwood

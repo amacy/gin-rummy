@@ -1,21 +1,21 @@
 require 'minitest/autorun'
-require_relative '../deck.rb'
+require_relative '../rummy.rb'
 
 describe Card do
   before do
-    @card1 = Card.new(A, 'Spades')
-    @card2 = Card.new(J, 'Hearts')
-    @card3 = Card.new(7, 'Clubs')
+    @card1 = Card.new(:ace, :spades)
+    @card2 = Card.new(:jack, :hearts)
+    @card3 = Card.new(:seven, :clubs)
   end
 
   describe "#initialize" do
     it "should have a rank and suit" do
-      @card1.rank.must_equal A
-      @card1.suit.must_equal 'Spades'
-      @card2.rank.must_equal J
-      @card2.suit.must_equal 'Hearts'
+      @card1.rank.must_equal 1
+      @card1.suit.must_equal :spades
+      @card2.rank.must_equal 11 
+      @card2.suit.must_equal :hearts
       @card3.rank.must_equal 7
-      @card3.suit.must_equal 'Clubs'
+      @card3.suit.must_equal :clubs
     end
   end
 
@@ -76,10 +76,11 @@ describe Player do
       @player.cards.must_be_instance_of Array
       @player.cards.length.must_equal 10
       @player.score.must_equal 0
-      @player.sets.length.must_equal 13
-      @player.sets[7].must_equal []
-      @player.runs.length.must_equal 4
-      @player.runs['Spades'].must_equal []
+      @player.sets.must_equal []
+      @player.seven.must_equal []
+      @player.runs.must_equal []
+      @player.spades.must_equal []
+      @player.melds.must_equal []
     end
   end
   
@@ -108,40 +109,110 @@ describe Player do
 
   describe '#find_sets' do
     before do
-      @card1 = Card.new(A, 'Diamonds')
-      @card2 = Card.new(A, 'Clubs')
-      @card3 = Card.new(A, 'Spades')
-      @melds = [@card1, @card2, @card3]
-      @player2 = Player.new(@melds)
+      @card1 = Card.new(:ace, :diamonds)
+      @card2 = Card.new(:ace, :clubs)
+      @card3 = Card.new(:ace, :spades)
+      @card4 = Card.new(:two, :clubs)
+      @card5 = Card.new(:three, :clubs)
+      @card6 = Card.new(:four, :clubs)
+      @card7 = Card.new(:seven, :clubs)
+      @card8 = Card.new(:four, :diamonds)
+      @card9 = Card.new(:five, :diamonds)
+      @cards = [@card1, @card2, @card3, @card4, @card5,
+                @card6, @card7, @card9, @card8]
+      @player2 = Player.new(@cards)
       @player2.find_sets
     end
 
     it 'should return an array of sets' do
-      @player2.sets[A].must_include @card1
-      @player2.sets[A].must_include @card2
-      @player2.sets[A].must_include @card3
+      @player2.ace.must_include @card1
+      @player2.ace.must_include @card2
+      @player2.ace.must_include @card3
+      @player2.sets.must_include @card1
+      @player2.sets.must_include @card2
+      @player2.sets.must_include @card3
+      @player2.two.wont_include @card4
+      @player2.three.wont_include @card5
+      @player2.four.wont_include @card6
+      @player2.seven.wont_include @card7
+      @player2.four.wont_include @card8
+      @player2.five.wont_include @card9
+    end
+
+    describe '#sort_hand' do
+      before do
+        @player2.sort_hand
+      end
+
+      it 'should order the cards by rank' do
+        @player2.cards.last.must_equal @card7
+      end
+
+      describe '#sort_be_suit' do
+        before do
+          @player2.sort_by_suit
+        end
+        
+        it 'should sort cards by suit' do
+          @player2.clubs.must_include @card2
+          @player2.clubs.must_include @card4
+          @player2.clubs.must_include @card5
+          @player2.clubs.must_include @card6
+          @player2.clubs.must_include @card7
+          @player2.clubs.length.must_equal 5
+          @player2.diamonds.must_include @card1
+          @player2.diamonds.must_include @card8
+          @player2.diamonds.must_include @card9
+          @player2.diamonds.length.must_equal 3
+          @player2.spades.must_include @card3
+          @player2.spades.length.must_equal 1
+          @player2.hearts.length.must_equal 0
+        end
+
+        describe '#find_runs' do
+          before do
+            @player2.find_runs        end
+
+          it 'should return an array of runs' do
+            @player2.runs.must_include @card2
+            @player2.runs.must_include @card4
+            @player2.runs.must_include @card5
+            @player2.runs.must_include @card6
+            @player2.runs.length.must_equal 4
+          end
+        end
+
+        describe '#find_melds' do
+          before do
+            @player2.find_melds
+          end
+          
+          it 'should return an array of all the cards in melds' do
+          skip
+            @player2.melds.must_include @card1
+            @player2.melds.must_include @card2
+            @player2.melds.must_include @card3
+            @player2.melds.must_include @card4
+            @player2.melds.must_include @card5
+            @player2.melds.must_include @card6
+            @player2.melds.length.must_equal 6
+          end
+        end
+
+        describe '#find_cards_in_2_melds' do
+          before do
+            @player2.find_cards_in_2_melds
+          end
+
+          it 'should'
+        end
+      end
     end
   end
 
-  describe '#find_runs' do
-    before do
-      @card4 = Card.new(2, 'Clubs')
-      @card5 = Card.new(3, 'Clubs')
-      @card6 = Card.new(4, 'Clubs')
-      @melds2 = [@card4, @card5, @card6]
-      @player3 = Player.new(@melds2)
-      @player3.find_runs
-    end
-
-    it 'should return an array of runs' do
-      @player3.runs['Clubs'].must_include @card4
-      @player3.runs['Clubs'].must_include @card5
-      @player3.runs['Clubs'].must_include @card6
-    end
+  describe '#deadwood' do
   end
-  #  describe '#deadwood' do
-  #  end
-  #
+  
   #  describe '#gin' do
   #  end
   #
