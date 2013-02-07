@@ -84,8 +84,9 @@ class Player
     @cards, @melds, @runs, @sets, @deadwood_cards = [], [], [], [], []
     @score, @deadwood_count = 0, 0
     cards.each { |card| @cards << card }
-    RANKS.each_key { |rank| instance_variable_set("@#{rank}", Array.new) }
-    SUITS.each { |suit| instance_variable_set("@#{suit}", Array.new) }
+    set_vars = Proc.new { |v| instance_variable_set("@#{v}", Array.new) }
+    RANKS.each_key(&set_vars)
+    SUITS.each(&set_vars)
   end
 
   def draw(card)
@@ -129,9 +130,7 @@ class Player
       suit.each do |card1|
         suit.each do |card2|
           suit.each do |card3|
-            c1 = card1.rank
-            c2 = card2.rank
-            c3 = card3.rank
+            c1, c2, c3 = card1.rank, card2.rank, card3.rank
             unless @runs.include?(card1)
               if c1 == c2 + 1 && c1 == c3 + 2
                 @runs << card1
@@ -148,12 +147,9 @@ class Player
   end
 
   def find_melds
-    @runs.each do |card|
-      @melds << card unless @melds.include?(card)
-    end
-    @sets.each do |card|
-      @melds << card unless @melds.include?(card)
-    end
+    add_cards = Proc.new { |card| @melds << card unless @melds.include?(card) }
+    @runs.each(&add_cards)
+    @sets.each(&add_cards)
   end
 
 #  def find_cards_in_2_melds
