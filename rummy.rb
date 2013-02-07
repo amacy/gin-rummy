@@ -176,19 +176,11 @@ class Player
   end
 
   def gin?
-    if @deadwood_count == 0
-      true
-    else
-      false
-    end
+    @deadwood_count == 0
   end
   
   def can_knock?
-    if @deadwood_count <= 10
-      true
-    else
-      false
-    end
+    @deadwood_count <= 10
   end
 end
 
