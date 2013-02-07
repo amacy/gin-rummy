@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 SUITS = [:clubs, :diamonds, :hearts, :spades]
 RANKS = {
   ace: 1,
@@ -16,20 +18,28 @@ RANKS = {
 }
 
 class Card
-  attr_reader :rank, :suit, :value
+  attr_reader :rank, :suit, :value, :name
 
   def initialize(rank, suit)
     @rank, @suit = RANKS[rank], suit
-  end
-
-  def calc_value
-    if @rank > 10
-      @value = 10
-    elsif @rank == 1
-      @value = 1
-    else 
-      @value = @rank
+    def name
+      if @rank == 1 || @rank > 10
+        @name = "#{RANKS.invert[@rank].capitalize} of #{@suit.capitalize}"
+      else
+        @name = "#{@rank} of #{@suit.capitalize}"
+      end
     end
+    def calc_value
+      if @rank > 10
+        @value = 10
+      elsif @rank == 1
+        @value = 1
+      else 
+        @value = @rank
+      end
+    end
+    name
+    calc_value
   end
 end
 
@@ -68,11 +78,11 @@ end
 class Player
   attr_reader :cards, :score, :sets, :runs, :melds, :spades, :diamonds,
     :clubs, :hearts, :ace, :two, :three, :four, :five, :six, :seven,
-    :eight, :nine, :ten, :jack, :queen, :king
+    :eight, :nine, :ten, :jack, :queen, :king, :deadwood_cards, :deadwood_count
 
   def initialize(cards)
-    @cards, @melds, @runs, @sets = [], [], [], []
-    @score = 0
+    @cards, @melds, @runs, @sets, @deadwood_cards = [], [], [], [], []
+    @score, @deadwood_count = 0, 0
     cards.each { |card| @cards << card }
     RANKS.each_key { |rank| instance_variable_set("@#{rank}", Array.new) }
     SUITS.each { |suit| instance_variable_set("@#{suit}", Array.new) }
@@ -84,9 +94,6 @@ class Player
   
   def discard(n)
     @cards.delete_at(n)
-  end
-
-  def calc_score
   end
 
   def find_sets # also sorts by rank
@@ -141,25 +148,56 @@ class Player
   end
 
   def find_melds
-    @melds = @runs.concat(@sets)
-  end
-
-  def find_cards_in_2_melds
-    @sets.each do |card1|
-      @runs.each do |card2|
-        if card1 == card2
-          puts "Warning: #{card1} is in in two melds"
-        end
-      end
+    @runs.each do |card|
+      @melds << card unless @melds.include?(card)
+    end
+    @sets.each do |card|
+      @melds << card unless @melds.include?(card)
     end
   end
 
-  def deadwood
+#  def find_cards_in_2_melds
+#    @sets.each do |card1|
+#      @runs.each do |card2|
+#        if card1 == card2
+#          puts "Warning: #{card1} is in in two melds"
+#        end
+#      end
+#    end
+#  end
+
+  def calc_deadwood
+    def find_deadwood_cards
+      @cards.each do |card|
+        @deadwood_cards << card unless @melds.include?(card)
+      end
+    end
+    def calc_deadwood_count
+      @deadwood_cards.each { |card| @deadwood_count += card.value }
+    end
+    find_deadwood_cards
+    calc_deadwood_count
+  end
+
+  def gin?
+    if @deadwood_count == 0
+      true
+    else
+      false
+    end
+  end
+  
+  def can_knock?
+    if @deadwood_count <= 10
+      true
+    else
+      false
+    end
   end
 end
 
 class Game
-  attr_reader :player1, :player2, :deck, :discard_pile, :turn, :whos_turn
+  attr_reader :player1, :player2, :deck, :discard_pile, :turn, :whos_turn, :knock
 
   def initialize
     @deck = Deck.new
@@ -170,29 +208,18 @@ class Game
     players = []
     players << @player1 << @player2
     @whos_turn = players.sample
+    @knock = false
   end
 
   def status
     "TURN #{@turns}:\n" +
-    "#{@deck.cards.length} cards left\n" +
-    "#{@whos_turn}'s turn"
-    # "Your current score is #{score}"
-  end
-
-  def new_turn 
-    @turn += 1
-    #puts status
-    #puts draw
-    #puts discard
-    if @whos_turn = @player1
-      @player2
-    else
-      @player1
-    end
+    "Stock pile: #{@deck.cards.length}\n" +
+    "#{@whos_turn}'s turn\n" +
+    "Your deadwood count is #{@whos_turn.deadwood_count}. #{alert_knock}"
   end
 
   def draw
-    puts "Would you like to pick up the #{@discard_pile.top}?"
+    puts "Would you like to pick up the #{@discard_pile.top.name}?"
     if gets.chomp == 'y'
       @whos_turn.draw(@discard_pile.top)
     else
@@ -204,7 +231,7 @@ class Game
     i = 0
     puts "Which card would you like to discard?\n"
     @whos_turn.cards.each do |card|
-      puts "#{i}: #{card.to_s}"
+      puts "#{i}: #{card.name}"
       i += 1
     end
     n = gets.chomp
@@ -214,6 +241,59 @@ class Game
     else
       @whos_turn.discard(n)
     end
+  end
+
+  def alert_knock
+    'You can knock!' if @whos_turn.can_knock?
+  end
+  
+  def prompt_knock
+    if @whos_turn.can_knock?
+      'Would you like to knock? (y/n)'
+      if gets.chomp == 'y'
+        @knock = true
+      end
+    end
+  end
+
+  def alert_gin
+    'You have gin!' if @whos_turn.gin?
+  end
+
+  def game_over?
+  end
+
+  def game_over
+  end
+
+  def hand_over?
+    if @knock || @whos_turn.gin? || @deck.cards.length == 0
+      true
+    else
+      false
+    end
+  end
+
+  def play_turn 
+    @turn += 1
+    #puts status
+    #puts draw
+    #puts discard
+    alert_knock
+    alert_gin
+    #next_turn unless hand_over?
+  end
+
+  def next_turn
+    if @whos_turn == @player1
+      @whos_turn = @player2
+    else
+      @whos_turn = @player1
+    end
+    play_turn
+  end
+
+  def calc_score
   end
 end
 

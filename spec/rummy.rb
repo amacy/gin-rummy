@@ -12,21 +12,13 @@ describe Card do
     it "should have a rank and suit" do
       @card1.rank.must_equal 1
       @card1.suit.must_equal :spades
+      @card1.name.must_equal 'Ace of Spades'
       @card2.rank.must_equal 11 
       @card2.suit.must_equal :hearts
+      @card2.name.must_equal 'Jack of Hearts'
       @card3.rank.must_equal 7
       @card3.suit.must_equal :clubs
-    end
-  end
-
-  describe '#calc_value' do
-    before do
-      @card1.calc_value
-      @card2.calc_value
-      @card3.calc_value
-    end
-
-    it "should calculate the card's value" do
+      @card3.name.must_equal '7 of Clubs'
       @card1.value.must_equal 1
       @card2.value.must_equal 10
       @card3.value.must_equal 7
@@ -76,6 +68,8 @@ describe Player do
       @player.cards.must_be_instance_of Array
       @player.cards.length.must_equal 10
       @player.score.must_equal 0
+      @player.deadwood_count.must_equal 0
+      @player.deadwood_cards.must_equal []
       @player.sets.must_equal []
       @player.seven.must_equal []
       @player.runs.must_equal []
@@ -171,7 +165,8 @@ describe Player do
 
         describe '#find_runs' do
           before do
-            @player2.find_runs        end
+            @player2.find_runs
+          end
 
           it 'should return an array of runs' do
             @player2.runs.must_include @card2
@@ -180,47 +175,82 @@ describe Player do
             @player2.runs.must_include @card6
             @player2.runs.length.must_equal 4
           end
-        end
 
-        describe '#find_melds' do
-          before do
-            @player2.find_melds
-          end
-          
-          it 'should return an array of all the cards in melds' do
-          skip
-            @player2.melds.must_include @card1
-            @player2.melds.must_include @card2
-            @player2.melds.must_include @card3
-            @player2.melds.must_include @card4
-            @player2.melds.must_include @card5
-            @player2.melds.must_include @card6
-            @player2.melds.length.must_equal 6
-          end
-        end
+          describe '#find_melds' do
+            before do
+              @player2.find_melds
+            end
+            
+            it 'should return an array of all the cards in melds' do
+              @player2.melds.must_include @card1
+              @player2.melds.must_include @card2
+              @player2.melds.must_include @card3
+              @player2.melds.must_include @card4
+              @player2.melds.must_include @card5
+              @player2.melds.must_include @card6
+              @player2.melds.length.must_equal 6
+            end
 
-        describe '#find_cards_in_2_melds' do
-          before do
-            @player2.find_cards_in_2_melds
-          end
+#          describe '#find_cards_in_2_melds' do
+#            before do
+#              @player2.find_cards_in_2_melds
+#            end
+#
+#            it 'should'
 
-          it 'should'
+            describe '#calc_deadwood' do
+              before do
+                @player2.calc_deadwood
+              end
+
+              it 'should calc the total deadwood' do
+                @player2.deadwood_cards.must_include @card7
+                @player2.deadwood_cards.must_include @card8
+                @player2.deadwood_cards.must_include @card9
+                @player2.deadwood_cards.length.must_equal 3
+                @player2.deadwood_count.must_equal 16
+              end
+
+              describe '#gin?' do
+                before do
+                  @player3 = Player.new([@card1, @card2, @card3,
+                                         @card4, @card5, @card6])
+                  @player3.sort_hand
+                  @player3.sort_by_suit
+                  @player3.find_sets
+                  @player3.find_runs
+                  @player3.find_melds
+                  @player3.calc_deadwood
+                end
+
+                it 'should return true when gin' do
+                  @player3.gin?.must_equal true
+                end
+
+                it 'should return false otherwise' do
+                  @player2.gin?.must_equal false
+                end
+            
+                describe '#can_knock?' do
+                  it 'should return true when deadwood <= 10' do
+                    @player3.can_knock?.must_equal true
+                  end
+
+                  it 'should return false otherwise' do
+                    @player2.can_knock?.must_equal false
+                  end
+                end
+              end
+              
+                describe '#undercut' do
+                end
+
+            end
+          end
         end
       end
     end
   end
-
-  describe '#deadwood' do
-  end
-  
-  #  describe '#gin' do
-  #  end
-  #
-  #  describe '#knock' do
-  #  end
-  #
-  #  describe '#undercut' do
-  #  end
 end
 
 describe Game do
@@ -235,8 +265,29 @@ describe Game do
       @game.deck.must_be_instance_of Deck
       @game.turn.must_equal 0
       @game.whos_turn.must_be_instance_of Player
+      @game.knock.must_equal false
     end
-  end
+
+    describe '#play_turn' do
+      before do
+        @last_player = @game.whos_turn
+        @game.play_turn
+      end
+      
+      it 'should iterate the turn number' do
+        @game.turn.must_equal 1
+      end
+  
+      describe '#next_turn' do
+        before do
+          @game.next_turn
+        end
+
+        it 'should change the value of @whos_turn' do
+          @last_player.wont_equal @game.whos_turn
+        end
+      end
+    end
 
 #  describe '#status' do
 #    before do
@@ -252,14 +303,6 @@ describe Game do
 #
 #  describe '#discard'
 
-  describe '#turn' do
-    before do
-      @game.new_turn
-    end
-    
-    it 'should iterate the turn number' do
-      @game.turn.must_equal 1
-    end
   end
 end
 
