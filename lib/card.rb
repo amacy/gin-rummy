@@ -1,4 +1,4 @@
-require_relative 'ranks_and_suits'
+require_relative "ranks_and_suits"
 
 class Card
   include RanksAndSuits

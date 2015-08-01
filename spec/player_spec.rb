@@ -1,5 +1,5 @@
-require 'minitest/autorun'
-require_relative '../lib/player.rb'
+require "minitest/autorun"
+require_relative "../lib/player"
 
 describe Player do
   before do
@@ -8,8 +8,8 @@ describe Player do
     @player = Player.new(@deck.deal_hand)
   end
 
-  describe '#initialize' do
-    it 'should set some instance variables' do
+  describe "#initialize" do
+    it "should set some instance variables" do
       @player.cards.must_be_instance_of Array
       @player.cards.length.must_equal 10
       @player.score.must_equal 0
@@ -23,7 +23,7 @@ describe Player do
     end
   end
 
-  describe '#draw' do
+  describe "#draw" do
     before do
       @player.draw(@drawn_card)
     end
@@ -33,7 +33,7 @@ describe Player do
       @player.cards.last.must_be_instance_of Card
     end
 
-    describe '#discard' do
+    describe "#discard" do
       before do
         @player.discard(10)
       end
@@ -46,7 +46,7 @@ describe Player do
     end
   end
 
-  describe '#find_sets' do
+  describe "#find_sets" do
     before do
       @card1 = Card.new(:ace, :diamonds)
       @card2 = Card.new(:ace, :clubs)
@@ -63,7 +63,7 @@ describe Player do
       @player2.find_sets
     end
 
-    it 'should return an array of sets' do
+    it "should return an array of sets" do
       @player2.ace.must_include @card1
       @player2.ace.must_include @card2
       @player2.ace.must_include @card3
@@ -78,21 +78,21 @@ describe Player do
       @player2.five.wont_include @card9
     end
 
-    describe '#sort_hand' do
+    describe "#sort_hand" do
       before do
         @player2.sort_hand
       end
 
-      it 'should order the cards by rank' do
+      it "should order the cards by rank" do
         @player2.cards.last.must_equal @card7
       end
 
-      describe '#sort_be_suit' do
+      describe "#sort_be_suit" do
         before do
           @player2.sort_by_suit
         end
 
-        it 'should sort cards by suit' do
+        it "should sort cards by suit" do
           @player2.clubs.must_include @card2
           @player2.clubs.must_include @card4
           @player2.clubs.must_include @card5
@@ -108,12 +108,12 @@ describe Player do
           @player2.hearts.length.must_equal 0
         end
 
-        describe '#find_runs' do
+        describe "#find_runs" do
           before do
             @player2.find_runs
           end
 
-          it 'should return an array of runs' do
+          it "should return an array of runs" do
             @player2.runs.must_include @card2
             @player2.runs.must_include @card4
             @player2.runs.must_include @card5
@@ -121,12 +121,12 @@ describe Player do
             @player2.runs.length.must_equal 4
           end
 
-          describe '#find_melds' do
+          describe "#find_melds" do
             before do
               @player2.find_melds
             end
 
-            it 'should return an array of all the cards in melds' do
+            it "should return an array of all the cards in melds" do
               @player2.melds.must_include @card1
               @player2.melds.must_include @card2
               @player2.melds.must_include @card3
@@ -136,19 +136,19 @@ describe Player do
               @player2.melds.length.must_equal 6
             end
 
-#          describe '#find_cards_in_2_melds' do
+#          describe "#find_cards_in_2_melds" do
 #            before do
 #              @player2.find_cards_in_2_melds
 #            end
 #
-#            it 'should'
+#            it "should"
 
-            describe '#calc_deadwood' do
+            describe "#calc_deadwood" do
               before do
                 @player2.calc_deadwood
               end
 
-              it 'should calc the total deadwood' do
+              it "should calc the total deadwood" do
                 @player2.deadwood_cards.must_include @card7
                 @player2.deadwood_cards.must_include @card8
                 @player2.deadwood_cards.must_include @card9
@@ -156,7 +156,7 @@ describe Player do
                 @player2.deadwood_count.must_equal 16
               end
 
-              describe '#gin?' do
+              describe "#gin?" do
                 before do
                   @player3 = Player.new([@card1, @card2, @card3,
                                          @card4, @card5, @card6])
@@ -168,26 +168,26 @@ describe Player do
                   @player3.calc_deadwood
                 end
 
-                it 'should return true when gin' do
+                it "should return true when gin" do
                   @player3.gin?.must_equal true
                 end
 
-                it 'should return false otherwise' do
+                it "should return false otherwise" do
                   @player2.gin?.must_equal false
                 end
 
-                describe '#can_knock?' do
-                  it 'should return true when deadwood <= 10' do
+                describe "#can_knock?" do
+                  it "should return true when deadwood <= 10" do
                     @player3.can_knock?.must_equal true
                   end
 
-                  it 'should return false otherwise' do
+                  it "should return false otherwise" do
                     @player2.can_knock?.must_equal false
                   end
                 end
               end
 
-                describe '#undercut' do
+                describe "#undercut" do
                 end
 
             end
