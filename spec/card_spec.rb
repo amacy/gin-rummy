@@ -1,27 +1,27 @@
-require 'minitest/autorun'
-require_relative '../lib/card.rb'
+require "minitest/autorun"
+require_relative "../lib/card"
 
 describe Card do
   before do
-    @card1 = Card.new(:ace, :spades)
-    @card2 = Card.new(:jack, :hearts)
-    @card3 = Card.new(:seven, :clubs)
+    @ace_of_spades = Card.new(:ace, :spades)
+    @jack_of_hearts = Card.new(:jack, :hearts)
+    @seven_of_clubs = Card.new(:seven, :clubs)
   end
 
-  describe "#initialize" do
-    it "should have a rank and suit" do
-      @card1.rank.must_equal 1
-      @card1.suit.must_equal :spades
-      @card1.name.must_equal 'Ace of Spades'
-      @card2.rank.must_equal 11
-      @card2.suit.must_equal :hearts
-      @card2.name.must_equal 'Jack of Hearts'
-      @card3.rank.must_equal 7
-      @card3.suit.must_equal :clubs
-      @card3.name.must_equal '7 of Clubs'
-      @card1.value.must_equal 1
-      @card2.value.must_equal 10
-      @card3.value.must_equal 7
-    end
+  it "has a rank, name, value and suit" do
+    @ace_of_spades.rank.must_equal 1
+    @ace_of_spades.suit.must_equal :spades
+    @ace_of_spades.name.must_equal "Ace of Spades"
+    @ace_of_spades.value.must_equal 1
+
+    @jack_of_hearts.rank.must_equal 11
+    @jack_of_hearts.suit.must_equal :hearts
+    @jack_of_hearts.name.must_equal "Jack of Hearts"
+    @jack_of_hearts.value.must_equal 10
+
+    @seven_of_clubs.rank.must_equal 7
+    @seven_of_clubs.suit.must_equal :clubs
+    @seven_of_clubs.name.must_equal "Seven of Clubs"
+    @seven_of_clubs.value.must_equal 7
   end
 end
