@@ -1,60 +1,5 @@
 require 'minitest/autorun'
-require_relative '../rummy.rb'
-
-describe Card do
-  before do
-    @card1 = Card.new(:ace, :spades)
-    @card2 = Card.new(:jack, :hearts)
-    @card3 = Card.new(:seven, :clubs)
-  end
-
-  describe "#initialize" do
-    it "should have a rank and suit" do
-      @card1.rank.must_equal 1
-      @card1.suit.must_equal :spades
-      @card1.name.must_equal 'Ace of Spades'
-      @card2.rank.must_equal 11 
-      @card2.suit.must_equal :hearts
-      @card2.name.must_equal 'Jack of Hearts'
-      @card3.rank.must_equal 7
-      @card3.suit.must_equal :clubs
-      @card3.name.must_equal '7 of Clubs'
-      @card1.value.must_equal 1
-      @card2.value.must_equal 10
-      @card3.value.must_equal 7
-    end
-  end
-end
-
-describe Deck do
-  before do
-    @deck = Deck.new
-  end
-
-  describe '#initialize' do
-    it 'should set some instance variables' do
-      @deck.cards.must_be_instance_of Array
-    end
-  end
-
-  describe '#full' do
-    it 'should create 52 cards' do
-      @deck.cards.length.must_equal 52
-      @deck.cards.sample.must_be_instance_of Card
-    end
-  end
-
-  describe '#deal_hand (& remove_card)' do
-    before do
-      @hand = @deck.deal_hand
-    end
-
-    it 'should select and remove 10 cards from the deck' do
-      @hand.length.must_equal 10
-      @deck.cards.length.must_equal 42
-    end
-  end
-end
+require_relative '../lib/player.rb'
 
 describe Player do
   before do
@@ -77,7 +22,7 @@ describe Player do
       @player.melds.must_equal []
     end
   end
-  
+
   describe '#draw' do
     before do
       @player.draw(@drawn_card)
@@ -146,7 +91,7 @@ describe Player do
         before do
           @player2.sort_by_suit
         end
-        
+
         it 'should sort cards by suit' do
           @player2.clubs.must_include @card2
           @player2.clubs.must_include @card4
@@ -180,7 +125,7 @@ describe Player do
             before do
               @player2.find_melds
             end
-            
+
             it 'should return an array of all the cards in melds' do
               @player2.melds.must_include @card1
               @player2.melds.must_include @card2
@@ -230,7 +175,7 @@ describe Player do
                 it 'should return false otherwise' do
                   @player2.gin?.must_equal false
                 end
-            
+
                 describe '#can_knock?' do
                   it 'should return true when deadwood <= 10' do
                     @player3.can_knock?.must_equal true
@@ -241,7 +186,7 @@ describe Player do
                   end
                 end
               end
-              
+
                 describe '#undercut' do
                 end
 
@@ -253,77 +198,3 @@ describe Player do
   end
 end
 
-describe Game do
-  before do
-    @game = Game.new
-  end
-
-  describe '#initialize' do
-    it 'should set some instance variables' do
-      @game.player1.must_be_instance_of Player
-      @game.player2.must_be_instance_of Player
-      @game.deck.must_be_instance_of Deck
-      @game.turn.must_equal 0
-      @game.whos_turn.must_be_instance_of Player
-      @game.knock.must_equal false
-    end
-
-    describe '#play_turn' do
-      before do
-        @last_player = @game.whos_turn
-        @game.play_turn
-      end
-      
-      it 'should iterate the turn number' do
-        @game.turn.must_equal 1
-      end
-  
-      describe '#next_turn' do
-        before do
-          @game.next_turn
-        end
-
-        it 'should change the value of @whos_turn' do
-          @last_player.wont_equal @game.whos_turn
-        end
-      end
-    end
-
-#  describe '#status' do
-#    before do
-#      @game.status
-#    end
-#
-#    it 'should put a string containing game info' do
-#      @game.status.must_include 
-#    end
-#  end
-#
-#  describe '#draw'
-#
-#  describe '#discard'
-
-  end
-end
-
-describe DiscardPile do
-  before do
-    @deck = Deck.new
-    @discard = @deck.remove_card
-    @discard_pile = DiscardPile.new(@discard)
-  end
-
-  describe '#initialize' do
-    it 'should set some instance variables' do
-      @discard_pile.cards.length.must_equal 1
-      @discard_pile.cards[0].must_be_instance_of Card
-      @deck.cards.length.must_equal 51
-    end
-  end
-
-  describe '#top' do
-    it 'should be the last card discarded' do
-      @discard_pile.top.must_equal @discard
-    end
-  end
-end
