@@ -1,5 +1,5 @@
-require_relative 'ranks_and_suits'
-require_relative 'card'
+require_relative "ranks_and_suits"
+require_relative "card"
 
 class Deck
   include RanksAndSuits
@@ -7,17 +7,18 @@ class Deck
   attr_reader :cards
 
   def initialize
-    @cards = []
-    full
+    @cards = _generate_cards
     @cards.shuffle!
   end
 
-  def full
+  def _generate_cards
+    generated_cards = []
     SUITS.each do |suit|
       RANKS.each_key do |rank|
-        @cards << Card.new(rank, suit)
+        generated_cards << Card.new(rank, suit)
       end
     end
+    generated_cards
   end
 
   def remove_card
@@ -28,9 +29,7 @@ class Deck
 
   def deal_hand
     hand = []
-    10.times do
-      hand << remove_card
-    end
+    10.times { hand << remove_card }
     hand
   end
 end
