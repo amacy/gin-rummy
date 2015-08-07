@@ -16,6 +16,7 @@ class Player
     set_vars = Proc.new { |v| instance_variable_set("@#{v}", Array.new) }
     RANKS.each_key(&set_vars)
     SUITS.each(&set_vars)
+    @has_knocked = false
   end
 
   def draw(card)
@@ -110,5 +111,13 @@ class Player
 
   def can_knock?
     @deadwood_count <= 10
+  end
+
+  def knock!
+    @has_knocked = true
+  end
+
+  def knocked?
+    @has_knocked
   end
 end

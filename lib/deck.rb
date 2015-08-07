@@ -32,4 +32,8 @@ class Deck
     10.times { hand << remove_card }
     hand
   end
+
+  def empty?
+    @cards.length == 0
+  end
 end
