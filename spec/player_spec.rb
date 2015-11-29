@@ -67,8 +67,7 @@ describe Player do
   end
 
   describe "#_runs" do
-    it "finds all runs" do
-      skip
+    it "finds runs that contain 3 cards" do
       ace_of_spades = Card.new(:ace, :spades)
       two_of_spades = Card.new(:two, :spades)
       three_of_spades = Card.new(:three, :spades)
@@ -77,7 +76,8 @@ describe Player do
       cards = [ace_of_spades, two_of_spades, three_of_spades, five_of_spades, five_of_clubs]
       player = Player.new(cards)
 
-      player._sets.must_equal [ace_of_spades, two_of_spades, three_of_spades]
+      expected_result = { :spades => [ace_of_spades, two_of_spades, three_of_spades] }
+      player._runs.must_equal expected_result
     end
   end
 end

@@ -42,10 +42,26 @@ class Player
     runs = {}
     _sorted_cards.each do |suit, cards|
       runs[suit] ||= []
-      cards.each do |card|
-        # fill in this logic
+      cards.each_with_index do |card, index|
+        next if runs[suit].include?(card)
+        possible_run = _find_run(card, cards, index)
+        runs[suit] << possible_run if possible_run.length >= 3
       end
     end
+    runs.select { |_, cards| cards.length > 0 }
+  end
+
+  def _find_run(current_card, cards, index)
+    next_index = index + 1
+    next_card = cards[next_index]
+    current_run = []
+    while next_card && current_card.rank + 1 == next_card.rank do
+      current_run << current_card
+      next_index += 1
+      current_card = next_card
+      next_card = cards[next_index]
+    end
+    current_run
   end
 
 #  def find_melds
