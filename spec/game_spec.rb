@@ -1,7 +1,6 @@
-require "minitest/autorun"
-require_relative "../lib/game"
+require "spec_helper"
 
-describe Game do
+RSpec.describe Game do
   before do
     @game = Game.new
     @game.play

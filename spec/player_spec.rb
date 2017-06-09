@@ -1,6 +1,4 @@
-require "pry"
-require "minitest/autorun"
-require_relative "../lib/player"
+require "spec_helper"
 
 describe Player do
   before do
@@ -15,11 +13,10 @@ describe Player do
     end
 
     it "should add a card to the player's hand" do
-      @player.cards.length.must_equal 11
-      @player.cards.last.must_equal @drawn_card
-      @player.cards.last.must_be_instance_of Card
+      expect(@player.cards.length).to eq 11
+      expect(@player.cards.last).to eq @drawn_card
+      expect(@player.cards.last).to be_an_instance_of Card
     end
-
   end
 
   describe "#discard" do
@@ -28,8 +25,8 @@ describe Player do
     end
 
     it "should remove a card from the player's hand" do
-      @player.cards.length.must_equal 10
-      @player.cards.wont_include @drawn_card
+      expect(@player.cards.length).to eq 10
+      expect(@player.cards).to_not include @drawn_card
     end
   end
 
@@ -37,7 +34,7 @@ describe Player do
     it "sorts cards by suit" do
       @player._sorted_cards.each do |suit, cards_array|
         cards_array.each do |card|
-          card.suit.must_equal suit
+          expect(card.suit).to eq suit
         end
       end
     end
@@ -45,8 +42,8 @@ describe Player do
     it "sorts suits by rank" do
       @player._sorted_cards.each do |suit, cards_array|
         cards_array.each do |card|
-          cards_array.first.rank.must_be :<=, card.rank
-          cards_array.last.rank.must_be :>=, card.rank
+          expect(cards_array.first.rank).to be <= card.rank
+          expect(cards_array.last.rank).to be >= card.rank
         end
       end
     end
@@ -62,12 +59,13 @@ describe Player do
       cards = [ace_of_spades, two_of_spades, five_of_hearts, five_of_spades, five_of_clubs]
       player = Player.new(cards)
 
-      player._sets.must_equal [five_of_hearts, five_of_spades, five_of_clubs]
+      expect(player._sets).to eq [five_of_hearts, five_of_spades, five_of_clubs]
     end
   end
 
   describe "#_runs" do
     it "finds runs that contain 3 cards" do
+      pending "WIP"
       ace_of_spades = Card.new(:ace, :spades)
       two_of_spades = Card.new(:two, :spades)
       three_of_spades = Card.new(:three, :spades)
@@ -77,7 +75,7 @@ describe Player do
       player = Player.new(cards)
 
       expected_result = { :spades => [ace_of_spades, two_of_spades, three_of_spades] }
-      player._runs.must_equal expected_result
+      expect(player._runs).to eq expected_result
     end
   end
 end

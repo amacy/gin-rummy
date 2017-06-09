@@ -1,15 +1,14 @@
-require "minitest/autorun"
-require_relative "../lib/deck"
+require "spec_helper"
 
-describe Deck do
+RSpec.describe Deck do
   before do
     @deck = Deck.new
   end
 
   describe "#_generate_cards" do
     it "creates 52 cards" do
-      @deck.cards.length.must_equal 52
-      @deck.cards.sample.must_be_instance_of Card
+      expect(@deck.cards.length).to eq 52
+      expect(@deck.cards.sample).to be_an_instance_of Card
     end
   end
 
@@ -17,8 +16,8 @@ describe Deck do
     it "removes a card from the deck and returns that card" do
       card = @deck.remove_card
 
-      @deck.cards.length.must_equal 51
-      card.must_be_instance_of Card
+      expect(@deck.cards.length).to eq 51
+      expect(card).to be_an_instance_of Card
     end
   end
 
@@ -28,9 +27,9 @@ describe Deck do
     end
 
     it "selects and remove 10 cards from the deck and returns the created hand" do
-      @hand.length.must_equal 10
-      @hand.first.must_be_instance_of Card
-      @deck.cards.length.must_equal 42
+      expect(@hand.length).to eq 10
+      expect(@hand.first).to be_an_instance_of Card
+      expect(@deck.cards.length).to eq 42
     end
   end
 end

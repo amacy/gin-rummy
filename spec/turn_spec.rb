@@ -1,9 +1,4 @@
-require "pry"
-require "minitest/autorun"
-require_relative "../lib/deck"
-require_relative "../lib/player"
-require_relative "../lib/discard_pile"
-require_relative "../lib/turn"
+require "spec_helper"
 
 describe Turn do
   # TODO: remove noise from stdout
@@ -28,15 +23,15 @@ STATUS
       ARGV.replace ["y", "3"]
       @turn.play
 
-      @turn._status.must_equal @status
-      @player.cards.must_include @last_discard
-      @player.knocked?.must_equal false
+      expect(@turn._status).to eq @status
+      expect(@player.cards).to include @last_discard
+      expect(@player.knocked?).to eq false
     end
   end
 
   describe "#_status" do
     it "returns a string with the status for the current hand" do
-      @turn._status.must_equal @status
+      expect(@turn._status).to eq @status
     end
   end
 
@@ -44,17 +39,16 @@ STATUS
     it "allows the player to pick up from the disard pile" do
       ARGV.replace ["y"]
       @turn._draw
-      @player.cards.must_include @last_discard
+      expect(@player.cards).to include @last_discard
     end
 
     it "allows the player to pick up from the deck" do
       random_card = @deck.remove_card
       ARGV.replace ["n"]
-      @deck.stub :remove_card, random_card do
-        @turn._draw
-      end
+      allow(@deck).to receive(:remove_card) { random_card }
 
-      @player.cards.must_include random_card
+      @turn._draw
+      expect(@player.cards).to include random_card
     end
   end
 
@@ -62,17 +56,16 @@ STATUS
     it "allows the player to discard one of the cards in their hand" do
       ARGV.replace ["3"]
       @turn._discard
-      @player.cards.wont_include @card_to_discard
+      expect(@player.cards).not_to include @card_to_discard
     end
   end
 
   describe "_prompt_knock" do
     it "gives the player the opportunity to knock" do
       ARGV.replace ["y"]
-      @player.stub :can_knock?, true do
-        @turn._prompt_knock
-      end
-      @player.knocked?.must_equal true
+      allow(@player).to receive(:can_knock?) { true }
+      @turn._prompt_knock
+      expect(@player.knocked?).to eq true
     end
   end
 end

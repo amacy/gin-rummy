@@ -1,6 +1,7 @@
 require_relative "deck"
 require_relative "discard_pile"
 require_relative "player"
+require_relative "turn"
 
 class Game
 
