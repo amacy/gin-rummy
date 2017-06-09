@@ -2,14 +2,15 @@ class Turn
 
   attr_reader :player
 
-  def initialize(player, discard_pile, deck)
+  def initialize(player, discard_pile, deck, output=STDOUT)
     @player = player
     @discard_pile = discard_pile
     @deck = deck
+    @output = output
   end
 
   def play
-    puts _status
+    @output.puts _status
     _draw
     _discard
     _prompt_knock if _alert_knock
@@ -25,7 +26,7 @@ STATUS
   end
 
   def _draw
-    puts "Would you like to pick up the #{@discard_pile.top.name}? y/n"
+    @output.puts "Would you like to pick up the #{@discard_pile.top.name}? y/n"
 
     if ARGV.shift == "y"
       @player.draw(@discard_pile.top)
@@ -35,10 +36,10 @@ STATUS
   end
 
   def _discard
-    puts "Which card would you like to discard?"
+    @output.puts "Which card would you like to discard?"
 
     @player.cards.each_with_index do |card, index|
-      puts "#{index}: #{card.name}"
+      @output.puts "#{index}: #{card.name}"
     end
 
     index_to_delete = ARGV.shift.to_i

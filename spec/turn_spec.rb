@@ -1,13 +1,12 @@
 require "spec_helper"
 
 describe Turn do
-  # TODO: remove noise from stdout
-
   before do
     @deck = Deck.new
     @player = Player.new(@deck.deal_hand)
     @discard_pile = DiscardPile.new(@deck.remove_card)
-    @turn = Turn.new(@player, @discard_pile, @deck)
+    @output = ""
+    @turn = Turn.new(@player, @discard_pile, @deck, StringIO.new(@output))
 
     @status = <<-STATUS
 Stock pile: 41
