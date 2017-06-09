@@ -19,6 +19,7 @@ class Hand
     @cards.delete_at(index)
   end
 
+  # should be renamed "cards_by_suit"
   def sorted_cards
     sorted_cards = @cards.sort_by { |card| card.rank }
     sorted_cards.group_by { |card| card.suit }
@@ -37,29 +38,20 @@ class Hand
   end
 
   def runs
-    runs = {}
-    sorted_cards.each do |suit, cards|
+    sorted_cards.inject({}) do |runs, (suit, cards)|
       runs[suit] ||= []
       cards.each_with_index do |card, index|
-        next if runs[suit].include?(card)
-        possible_run = _find_run(card, cards, index)
-        runs[suit] << possible_run if possible_run.length >= 3
+        next_card_1 = cards[index + 1]
+        next_card_2 = cards[index + 2]
+        break if [next_card_1, next_card_2].include?(nil)
+        if next_card_1.rank == card.rank + 1
+          if next_card_2.rank == card.rank + 2
+            runs[suit] << [card, next_card_1, next_card_2]
+          end
+        end
       end
+      runs
     end
-    runs.select { |_, cards| cards.length > 0 }
-  end
-
-  def _find_run(current_card, cards, index)
-    next_index = index + 1
-    next_card = cards[next_index]
-    current_run = []
-    while next_card && current_card.rank + 1 == next_card.rank do
-      current_run << current_card
-      next_index += 1
-      current_card = next_card
-      next_card = cards[next_index]
-    end
-    current_run
   end
 
 #  def find_melds

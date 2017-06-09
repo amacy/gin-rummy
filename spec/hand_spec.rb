@@ -65,7 +65,6 @@ RSpec.describe Hand do
 
   describe "#runs" do
     it "finds runs that contain 3 cards" do
-      pending "WIP"
       ace_of_spades = Card.new(:ace, :spades)
       two_of_spades = Card.new(:two, :spades)
       three_of_spades = Card.new(:three, :spades)
@@ -74,7 +73,10 @@ RSpec.describe Hand do
       cards = [ace_of_spades, two_of_spades, three_of_spades, five_of_spades, five_of_clubs]
       hand = Hand.new(cards)
 
-      expected_result = { :spades => [ace_of_spades, two_of_spades, three_of_spades] }
+      expected_result = {
+        :clubs => [],
+        :spades => [[ace_of_spades, two_of_spades, three_of_spades]],
+      }
       expect(hand.runs).to eq expected_result
     end
   end
