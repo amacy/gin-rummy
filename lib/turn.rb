@@ -1,9 +1,8 @@
 class Turn
+  attr_reader :hand
 
-  attr_reader :player
-
-  def initialize(player, discard_pile, deck, output=STDOUT)
-    @player = player
+  def initialize(hand, discard_pile, deck, output=STDOUT)
+    @hand = hand
     @discard_pile = discard_pile
     @deck = deck
     @output = output
@@ -20,8 +19,8 @@ class Turn
   def _status
 <<-STATUS
 Stock pile: #{@deck.cards.length}
-#{@player}'s turn
-Your deadwood count is #{@player.deadwood_count}.
+#{@hand}'s turn
+Your deadwood count is #{@hand.deadwood_count}.
 STATUS
   end
 
@@ -29,22 +28,22 @@ STATUS
     @output.puts "Would you like to pick up the #{@discard_pile.top.name}? y/n"
 
     if ARGV.shift == "y"
-      @player.draw(@discard_pile.top)
+      @hand.draw(@discard_pile.top)
     else
-      @player.draw(@deck.remove_card)
+      @hand.draw(@deck.remove_card)
     end
   end
 
   def _discard
     @output.puts "Which card would you like to discard?"
 
-    @player.cards.each_with_index do |card, index|
+    @hand.cards.each_with_index do |card, index|
       @output.puts "#{index}: #{card.name}"
     end
 
     index_to_delete = ARGV.shift.to_i
     if (0..10).include?(index_to_delete)
-      @player.discard(index_to_delete)
+      @hand.discard(index_to_delete)
     else
       # will need a real solution to this eventually
       raise "Out of range"
@@ -52,17 +51,17 @@ STATUS
   end
 
   def _alert_gin
-    "You have gin!" if @player.gin?
+    "You have gin!" if @hand.gin?
   end
 
   def _alert_knock
-    "You can knock!" if @player.can_knock?
+    "You can knock!" if @hand.can_knock?
   end
 
   def _prompt_knock
-    if @player.can_knock?
+    if @hand.can_knock?
       "Would you like to knock? (y/n)"
-      @player.knock! if ARGV.shift == "y"
+      @hand.knock! if ARGV.shift == "y"
     end
   end
 end
