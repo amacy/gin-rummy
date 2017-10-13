@@ -50,7 +50,7 @@ RSpec.describe Hand do
   end
 
   describe "#sets" do
-    it "finds all sets" do
+    it "finds a single set" do
       ace_of_spades = Card.new(:ace, :spades)
       two_of_spades = Card.new(:two, :spades)
       five_of_hearts = Card.new(:five, :hearts)
@@ -59,8 +59,10 @@ RSpec.describe Hand do
       cards = [ace_of_spades, two_of_spades, five_of_hearts, five_of_spades, five_of_clubs]
       hand = Hand.new(cards)
 
-      expect(hand.sets).to eq [five_of_hearts, five_of_spades, five_of_clubs]
+      expect(hand.sets).to eq [[five_of_hearts, five_of_spades, five_of_clubs]]
     end
+
+    it "finds multiple sets"
   end
 
   describe "#runs" do
@@ -70,7 +72,7 @@ RSpec.describe Hand do
       three_of_spades = Card.new(:three, :spades)
       five_of_spades = Card.new(:five, :spades)
       five_of_clubs = Card.new(:five, :clubs)
-      cards = [ace_of_spades, two_of_spades, three_of_spades, five_of_spades, five_of_clubs]
+      cards = [ace_of_spades, three_of_spades, five_of_spades, five_of_clubs, two_of_spades]
       hand = Hand.new(cards)
 
       expected_result = {
@@ -115,5 +117,36 @@ RSpec.describe Hand do
       }
       expect(hand.runs).to eq expected_result
     end
+  end
+
+  describe "find_melds" do
+    it "returns all sets and runs" do
+      ace_of_spades = Card.new(:ace, :spades)
+      two_of_spades = Card.new(:two, :spades)
+      three_of_spades = Card.new(:three, :spades)
+      five_of_spades = Card.new(:five, :spades)
+      five_of_clubs = Card.new(:five, :clubs)
+      seven_of_hearts = Card.new(:seven, :hearts)
+      seven_of_clubs = Card.new(:seven, :clubs)
+      seven_of_diamonds = Card.new(:seven, :diamonds)
+      nine_of_diamonds = Card.new(:nine, :diamonds)
+      ten_of_diamonds = Card.new(:ten, :diamonds)
+
+      cards = [
+        ace_of_spades, two_of_spades, three_of_spades, five_of_spades, five_of_clubs,
+        seven_of_hearts, seven_of_clubs, seven_of_diamonds, nine_of_diamonds, ten_of_diamonds,
+      ]
+      hand = Hand.new(cards)
+
+      melds = hand.find_melds
+      expect(melds.length).to eq 2
+      expect(melds[0]).to eq [ace_of_spades, two_of_spades, three_of_spades]
+      expect(melds[1].length).to eq 3
+      expect(melds[1]).to include seven_of_hearts
+      expect(melds[1]).to include seven_of_clubs
+      expect(melds[1]).to include seven_of_diamonds
+    end
+
+    it "doesn't include a single card in multiple melds"
   end
 end

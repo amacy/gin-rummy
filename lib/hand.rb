@@ -34,7 +34,8 @@ class Hand
 
       sets << matches if matches.length >= 3
     end
-    sets.flatten
+
+    sets
   end
 
   def runs
@@ -76,16 +77,19 @@ class Hand
     false
   end
 
-#  def find_melds
-#    add_cards = Proc.new { |card| @melds << card unless @melds.include?(card) }
-#    @runs.each(&add_cards)
-#    @sets.each(&add_cards)
-#  end
+ # this should find cards in 2 melds and handle that situation
+ def find_melds
+   melds = []
+   melds << runs.values.reject { |run| run.empty? }.flatten
+   melds << sets.flatten
+   melds
+ end
 
-  def find_cards_in_2_melds
-    # figure this out
-  end
+  # def find_cards_in_2_melds
+  #   # figure this out
+  # end
 
+  # this probably needs to update the melds first
 #  def calc_deadwood
 #    @cards.each do |card|
 #      @deadwood_cards << card unless @melds.include?(card)
