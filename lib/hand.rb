@@ -11,10 +11,12 @@ class Hand
     @has_knocked = false
   end
 
+  # shuold be a ! method
   def draw(card)
     @cards << card
   end
 
+  # shuold be a ! method
   def discard(index)
     @cards.delete_at(index)
   end
@@ -63,6 +65,29 @@ class Hand
     end
   end
 
+  def find_melds
+    melds = []
+    melds << runs.values.reject { |run| run.empty? }.flatten
+    melds << sets.flatten
+
+    cards_in_melds = melds.flatten
+
+    return melds if cards_in_melds == cards_in_melds.uniq
+
+    dups = cards_in_melds.group_by { |card| card }.select { |_, cards| cards.size > 1 }.map(&:first)
+
+    dups.map do |dup|
+      melds_with_dups = melds.select { |meld| meld.include?(dup) }
+
+      melds_by_deadwood = melds_with_dups.inject({}) do |hash, meld|
+        hash[_calculate_deadwood(meld)] = meld
+        hash
+      end
+
+      melds_by_deadwood[melds_by_deadwood.keys.min]
+    end
+  end
+
   def _already_in_a_run?(runs, card)
     runs.each { |run| return true if run.include?(card) }
 
@@ -77,26 +102,10 @@ class Hand
     false
   end
 
- # this should find cards in 2 melds and handle that situation
- def find_melds
-   melds = []
-   melds << runs.values.reject { |run| run.empty? }.flatten
-   melds << sets.flatten
-   melds
- end
-
-  # def find_cards_in_2_melds
-  #   # figure this out
-  # end
-
-  # this probably needs to update the melds first
-#  def calc_deadwood
-#    @cards.each do |card|
-#      @deadwood_cards << card unless @melds.include?(card)
-#    end
-#
-#    @deadwood_cards.each { |card| @deadwood_count += card.value }
-#  end
+  def _calculate_deadwood(melds)
+    deadwood_cards = @cards - melds.flatten
+    @deadwood_count = deadwood_cards.inject(0) { |sum, card| sum += card.value }
+  end
 
   def gin?
     @deadwood_count == 0

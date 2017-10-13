@@ -119,7 +119,7 @@ RSpec.describe Hand do
     end
   end
 
-  describe "find_melds" do
+  describe "#find_melds" do
     it "returns all sets and runs" do
       ace_of_spades = Card.new(:ace, :spades)
       two_of_spades = Card.new(:two, :spades)
@@ -147,6 +147,34 @@ RSpec.describe Hand do
       expect(melds[1]).to include seven_of_diamonds
     end
 
-    it "doesn't include a single card in multiple melds"
+    it "uses the combination of melds that produces the least deadwood" do
+      ace_of_spades = Card.new(:ace, :spades)
+      two_of_spades = Card.new(:two, :spades)
+      three_of_spades = Card.new(:three, :spades)
+      three_of_hearts = Card.new(:three, :hearts)
+      three_of_clubs = Card.new(:three, :clubs)
+
+      five_of_spades = Card.new(:five, :spades)
+      five_of_clubs = Card.new(:five, :clubs)
+      seven_of_diamonds = Card.new(:seven, :diamonds)
+      nine_of_diamonds = Card.new(:nine, :diamonds)
+      ten_of_diamonds = Card.new(:ten, :diamonds)
+
+      cards = [
+        ace_of_spades, two_of_spades, three_of_spades, three_of_hearts, three_of_clubs,
+        five_of_spades, five_of_clubs, seven_of_diamonds, nine_of_diamonds, ten_of_diamonds,
+      ]
+      hand = Hand.new(cards)
+
+      melds = hand.find_melds
+      expect(melds.length).to eq 1
+      expect(melds[0].length).to eq 3
+      expect(melds[0]).to include three_of_hearts
+      expect(melds[0]).to include three_of_clubs
+      expect(melds[0]).to include three_of_spades
+    end
+
+    it "works if a card is in 3 melds"
+    it "chooses which one if the deadwood is the same either way? is this even possible?"
   end
 end
