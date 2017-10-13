@@ -57,12 +57,26 @@ RSpec.describe Hand do
       five_of_spades = Card.new(:five, :spades)
       five_of_clubs = Card.new(:five, :clubs)
       cards = [ace_of_spades, two_of_spades, five_of_hearts, five_of_spades, five_of_clubs]
-      hand = Hand.new(cards)
 
+      hand = Hand.new(cards)
       expect(hand.sets).to eq [[five_of_hearts, five_of_spades, five_of_clubs]]
     end
 
-    it "finds multiple sets"
+    it "finds multiple sets" do
+      ace_of_spades = Card.new(:ace, :spades)
+      ace_of_hearts = Card.new(:ace, :hearts)
+      ace_of_diamonds = Card.new(:ace, :diamonds)
+      five_of_hearts = Card.new(:five, :hearts)
+      five_of_spades = Card.new(:five, :spades)
+      five_of_clubs = Card.new(:five, :clubs)
+      cards = [ace_of_spades, ace_of_hearts, ace_of_diamonds, five_of_hearts, five_of_spades, five_of_clubs]
+
+      hand = Hand.new(cards)
+      expect(hand.sets).to eq [
+        [ace_of_spades, ace_of_hearts, ace_of_diamonds],
+        [five_of_hearts, five_of_spades, five_of_clubs],
+      ]
+    end
   end
 
   describe "#runs" do
@@ -73,8 +87,8 @@ RSpec.describe Hand do
       five_of_spades = Card.new(:five, :spades)
       five_of_clubs = Card.new(:five, :clubs)
       cards = [ace_of_spades, three_of_spades, five_of_spades, five_of_clubs, two_of_spades]
-      hand = Hand.new(cards)
 
+      hand = Hand.new(cards)
       expected_result = {
         :clubs => [],
         :spades => [[ace_of_spades, two_of_spades, three_of_spades]],
@@ -90,8 +104,8 @@ RSpec.describe Hand do
       five_of_spades = Card.new(:five, :spades)
       five_of_clubs = Card.new(:five, :clubs)
       cards = [ace_of_spades, two_of_spades, three_of_spades, four_of_spades, five_of_spades, five_of_clubs]
-      hand = Hand.new(cards)
 
+      hand = Hand.new(cards)
       expected_result = {
         :clubs => [],
         :spades => [[ace_of_spades, two_of_spades, three_of_spades, four_of_spades, five_of_spades]],
@@ -107,8 +121,8 @@ RSpec.describe Hand do
       six_of_spades = Card.new(:six, :spades)
       seven_of_spades = Card.new(:seven, :spades)
       cards = [ace_of_spades, two_of_spades, three_of_spades, five_of_spades, six_of_spades, seven_of_spades]
-      hand = Hand.new(cards)
 
+      hand = Hand.new(cards)
       expected_result = {
         :spades => [
           [ace_of_spades, two_of_spades, three_of_spades],
