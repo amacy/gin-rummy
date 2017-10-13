@@ -41,17 +41,39 @@ class Hand
     sorted_cards.inject({}) do |runs, (suit, cards)|
       runs[suit] ||= []
       cards.each_with_index do |card, index|
+        next if _already_in_a_run?(runs[suit], card)
+
+        existing_run = _run_to_add_to(runs[suit], card)
+        next existing_run << card if existing_run
+
         next_card_1 = cards[index + 1]
         next_card_2 = cards[index + 2]
+
         break if [next_card_1, next_card_2].include?(nil)
+
         if next_card_1.rank == card.rank + 1
           if next_card_2.rank == card.rank + 2
             runs[suit] << [card, next_card_1, next_card_2]
           end
         end
       end
+
       runs
     end
+  end
+
+  def _already_in_a_run?(runs, card)
+    runs.each { |run| return true if run.include?(card) }
+
+    false
+  end
+
+  def _run_to_add_to(runs, card)
+    runs.each do |run|
+      return run if run.last.rank + 1 == card.rank
+    end
+
+    false
   end
 
 #  def find_melds

@@ -79,5 +79,41 @@ RSpec.describe Hand do
       }
       expect(hand.runs).to eq expected_result
     end
+
+    it "finds runs that contain more than 3 cards" do
+      ace_of_spades = Card.new(:ace, :spades)
+      two_of_spades = Card.new(:two, :spades)
+      three_of_spades = Card.new(:three, :spades)
+      four_of_spades = Card.new(:four, :spades)
+      five_of_spades = Card.new(:five, :spades)
+      five_of_clubs = Card.new(:five, :clubs)
+      cards = [ace_of_spades, two_of_spades, three_of_spades, four_of_spades, five_of_spades, five_of_clubs]
+      hand = Hand.new(cards)
+
+      expected_result = {
+        :clubs => [],
+        :spades => [[ace_of_spades, two_of_spades, three_of_spades, four_of_spades, five_of_spades]],
+      }
+      expect(hand.runs).to eq expected_result
+    end
+
+    it "finds multiple runs for a single suit" do
+      ace_of_spades = Card.new(:ace, :spades)
+      two_of_spades = Card.new(:two, :spades)
+      three_of_spades = Card.new(:three, :spades)
+      five_of_spades = Card.new(:five, :spades)
+      six_of_spades = Card.new(:six, :spades)
+      seven_of_spades = Card.new(:seven, :spades)
+      cards = [ace_of_spades, two_of_spades, three_of_spades, five_of_spades, six_of_spades, seven_of_spades]
+      hand = Hand.new(cards)
+
+      expected_result = {
+        :spades => [
+          [ace_of_spades, two_of_spades, three_of_spades],
+          [five_of_spades, six_of_spades, seven_of_spades],
+        ],
+      }
+      expect(hand.runs).to eq expected_result
+    end
   end
 end
