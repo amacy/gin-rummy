@@ -80,11 +80,23 @@ class Hand
       melds_with_dups = melds.select { |meld| meld.include?(dup) }
 
       melds_by_deadwood = melds_with_dups.inject({}) do |hash, meld|
-        hash[_calculate_deadwood(meld)] = meld
+        hash[_calculate_deadwood(meld)] ||= []
+        hash[_calculate_deadwood(meld)] << meld
         hash
       end
 
-      melds_by_deadwood[melds_by_deadwood.keys.min]
+      best_meld = melds_by_deadwood[melds_by_deadwood.keys.min]
+      if best_meld.count > 1
+        # TODO make run/set each a class to clean this up
+        if best_meld[0][0].value != best_meld[1][0].value
+          # this is the run
+          best_meld[0]
+        else
+          best_meld[1]
+        end
+      else
+        best_meld[0]
+      end
     end
   end
 

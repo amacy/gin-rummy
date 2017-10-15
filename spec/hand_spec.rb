@@ -188,7 +188,33 @@ RSpec.describe Hand do
       expect(melds[0]).to include three_of_spades
     end
 
-    it "works if a card is in 3 melds"
-    it "chooses which one if the deadwood is the same either way? is this even possible?"
+    # to be truely optimized, this would have to take into account discards + other cards in the hand.
+    # that's not a valid use case yet.
+    it "chooses the run if the deadwood is the same either way" do
+      two_of_spades = Card.new(:two, :spades)
+      three_of_spades = Card.new(:three, :spades)
+      three_of_hearts = Card.new(:three, :hearts)
+      three_of_clubs = Card.new(:three, :clubs)
+      four_of_spades = Card.new(:four, :spades)
+
+      jack_of_spades = Card.new(:jack, :spades)
+      five_of_clubs = Card.new(:five, :clubs)
+      seven_of_diamonds = Card.new(:seven, :diamonds)
+      nine_of_diamonds = Card.new(:nine, :diamonds)
+      ten_of_diamonds = Card.new(:ten, :diamonds)
+
+      cards = [
+        two_of_spades, three_of_spades, three_of_hearts, three_of_clubs, four_of_spades,
+        jack_of_spades, five_of_clubs, seven_of_diamonds, nine_of_diamonds, ten_of_diamonds,
+      ]
+      hand = Hand.new(cards)
+
+      melds = hand.find_melds
+      expect(melds.length).to eq 1
+      expect(melds[0].length).to eq 3
+      expect(melds[0]).to include two_of_spades
+      expect(melds[0]).to include three_of_spades
+      expect(melds[0]).to include four_of_spades
+    end
   end
 end
