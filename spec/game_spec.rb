@@ -8,14 +8,15 @@ RSpec.describe Game do
 
   describe "#play" do
     it "plays out a game" do
-      skip
-      # lots of setup required for this test
+      game = Game.new
+      game.play
+      expect(game.winner).to_not be_nil
     end
   end
 
   describe "final_score" do
-    it "calculates the score for both players" do
-      skip
-    end
+    it "calculates the score for both players"
+    it "adds 25 for gin"
+    it "adds 25 points for undercutting"
   end
 end

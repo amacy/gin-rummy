@@ -16,8 +16,18 @@ class Game
 
   def play
     while !_finished? do
-      @current_turn = Turn.new(_next_hand, @discard_pile, @deck).hand
+      @current_turn = Turn.new(_next_hand, @discard_pile, @deck).play
     end
+  end
+
+  def winner
+  #   return unless _finished?
+  #   if 
+  #   @players.map(&:deadwood_count).min
+  end
+
+  def final_score
+    # implement me
   end
 
   def _current_hand
@@ -29,12 +39,6 @@ class Game
   end
 
   def _next_hand
-    @hands.reject do |hand|
-      _current_hand == hand
-    end.first
-  end
-
-  def final_score
-    # implement me
+    @hands.find { |hand| _current_hand != hand }
   end
 end
